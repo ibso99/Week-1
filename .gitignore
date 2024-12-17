@@ -1,3 +1,4 @@
 tenxvenv/
 Data/
-Images/
+# Images/
+notebooks\Images
