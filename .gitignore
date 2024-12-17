@@ -1,4 +1,4 @@
 tenxvenv/
 Data/
-# Images/
-notebooks\Images
+Images/
+pynance/
