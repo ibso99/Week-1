@@ -6,6 +6,9 @@ from pypfopt import expected_returns
 import plotly.express as px
 
 
+
+
+#######################################################################################################
 class FinancialAnalyzer:
     def __init__(self, data_path, start_date=None, end_date=None):
         self.data_path = data_path
@@ -92,5 +95,45 @@ class FinancialAnalyzer:
         weights = ef.max_sharpe()
         portfolio_return, portfolio_volatility, sharpe_ratio = ef.portfolio_performance()
         return portfolio_return, portfolio_volatility, sharpe_ratio
+
+
+    def fetch_and_calculate_indicators(file_path, sma_window=20, ema_window=20, rsi_window=14):
+        """
+        Fetch stock data from local CSV, calculate SMVA, EMA, RSI, and MACD using TA-Lib.
+
+        Parameters:
+        - file_path (str): Path to the local CSV file containing stock data.
+        - sma_window (int): Window size for calculating SMVA.
+        - ema_window (int): Window size for calculating EMA.
+        - rsi_window (int): Window size for calculating RSI.
+
+        Returns:
+        - pd.DataFrame: Stock data with SMVA, EMA, RSI, and MACD.
+        """
+        # Load stock data
+        try:
+            df = pd.read_csv(file_path, parse_dates=['Date'], index_col='Date')
+            df = df.sort_index()  # Ensure the data is sorted by date
+            print("Data loaded successfully.")
+        except Exception as e:
+            print(f"Error loading data: {e}")
+            return None
+
+        # Simple Moving Average (SMVA)
+        df['SMVA'] = ta.SMA(df['Close'], timeperiod=sma_window)
+
+        # Exponential Moving Average (EMA)
+        df['EMA'] = ta.EMA(df['Close'], timeperiod=ema_window)
+
+        # Relative Strength Index (RSI)
+        df['RSI'] = ta.RSI(df['Close'], timeperiod=rsi_window)
+
+        # Moving Average Convergence Divergence (MACD)
+        df['MACD'], df['Signal_Line'], _ = ta.MACD(df['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
+
+        # Clean up the dataframe
+        indicators = df[['Close', 'SMVA', 'EMA', 'RSI', 'MACD', 'Signal_Line']]
+        return indicators
+
         
     
